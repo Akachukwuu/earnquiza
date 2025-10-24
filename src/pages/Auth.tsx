@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { LogIn, UserPlus } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useState } from "react";
+import { LogIn, UserPlus } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { signUp, signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
@@ -24,7 +24,7 @@ export function Auth() {
         setError(error.message);
       }
     } catch (err) {
-      setError('An unexpected error occurred');
+      setError("An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -35,13 +35,16 @@ export function Auth() {
       <div className="w-full max-w-md">
         <div className="bg-gray-800 rounded-2xl shadow-2xl border border-gray-700 p-8">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">Claim-to-Earn</h1>
-            <p className="text-gray-400">Earn ₦ every 6 hours</p>
+            <h1 className="text-4xl font-bold text-white mb-2">Quiza</h1>
+            <p className="text-gray-400">Earn PTs | Convert to cash</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-300 mb-2"
+              >
                 Email
               </label>
               <input
@@ -56,7 +59,10 @@ export function Auth() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-300 mb-2"
+              >
                 Password
               </label>
               <input
@@ -83,7 +89,7 @@ export function Auth() {
               className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
-                'Processing...'
+                "Processing..."
               ) : isSignUp ? (
                 <>
                   <UserPlus size={20} />
@@ -102,11 +108,13 @@ export function Auth() {
             <button
               onClick={() => {
                 setIsSignUp(!isSignUp);
-                setError('');
+                setError("");
               }}
               className="text-emerald-400 hover:text-emerald-300 transition text-sm"
             >
-              {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+              {isSignUp
+                ? "Already have an account? Sign In"
+                : "Don't have an account? Sign Up"}
             </button>
           </div>
         </div>
