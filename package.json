@@ -8,11 +8,12 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "postinstall": "npm install --legacy-peer-deps"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
-    "flutterwave-react-v3": "^1.0.7",
+    "flutterwave-react-v3": "1.0.7",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
