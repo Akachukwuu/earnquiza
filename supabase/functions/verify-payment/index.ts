@@ -7,6 +7,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const FLW_SECRET_KEY = Deno.env.get("FLUTTERWAVE_SECRET_KEY")!;
+const FLW_PUBLIC_KEY = import.meta.env.VITE_FLW_PUBLIC_KEY;
+
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !FLW_SECRET_KEY) {
   console.error("❌ Missing environment variables.");
