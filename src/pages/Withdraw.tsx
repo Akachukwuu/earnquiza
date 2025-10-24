@@ -49,8 +49,8 @@ export function Withdraw({ onBack }: WithdrawProps) {
       return;
     }
 
-    if (withdrawAmount < 100) {
-      setError("Minimum withdrawal is 100.00 PTs");
+    if (withdrawAmount < 700) {
+      setError("Minimum withdrawal is 700.00 PTs");
       return;
     }
 
