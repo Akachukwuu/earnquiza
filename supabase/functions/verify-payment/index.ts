@@ -10,7 +10,7 @@ const FLW_SECRET_KEY = Deno.env.get("FLUTTERWAVE_SECRET_KEY")!;
 const FLW_PUBLIC_KEY = import.meta.env.VITE_FLW_PUBLIC_KEY;
 
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !FLW_SECRET_KEY) {
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !FLUTTERWAVE_SECRET_KEY) {
   console.error("❌ Missing environment variables.");
 }
 
@@ -60,7 +60,7 @@ serve(async (req) => {
       `https://api.flutterwave.com/v3/transactions/${transaction_id}/verify`,
       {
         headers: {
-          Authorization: `Bearer ${FLW_SECRET_KEY}`,
+          Authorization: `Bearer ${FLUTTERWAVE_SECRET_KEY}`,
           "Content-Type": "application/json",
         },
       }
