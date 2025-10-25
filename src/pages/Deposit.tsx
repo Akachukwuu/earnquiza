@@ -221,7 +221,7 @@ export function Deposit({ onBack }: DepositProps) {
               Quick Amount
             </h3>
             <div className="grid grid-cols-3 gap-3">
-              {[1000].map((preset) => (
+              {[100, 1000].map((preset) => (
                 <button
                   key={preset}
                   onClick={() => setAmount(preset.toString())}
