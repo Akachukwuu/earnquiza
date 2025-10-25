@@ -6,11 +6,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // 🧩 Environment variables
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const FLW_SECRET_KEY = Deno.env.get("FLUTTERWAVE_SECRET_KEY")!;
-const FLW_PUBLIC_KEY = import.meta.env.VITE_FLW_PUBLIC_KEY;
+const FLW_SECRET_KEY = Deno.env.get("FLUTTERWAVE_SECRET_KEY")!; // ✅ correct
+const FLW_PUBLIC_KEY = Deno.env.get("VITE_FLW_PUBLIC_KEY") || "";
 
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !FLUTTERWAVE_SECRET_KEY) {
+// ✅ Check envs
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !FLW_SECRET_KEY) {
   console.error("❌ Missing environment variables.");
 }
 
@@ -26,7 +26,6 @@ function withCorsHeaders(res: Response) {
 }
 
 serve(async (req) => {
-  // ✅ Handle preflight CORS requests
   if (req.method === "OPTIONS") {
     return new Response("ok", {
       headers: {
@@ -40,7 +39,7 @@ serve(async (req) => {
   try {
     if (req.method !== "POST") {
       return withCorsHeaders(
-        new Response(JSON.stringify({ error: "Only POST allowed" }), { status: 405 })
+        new Response(JSON.stringify({ error: "Only POST allowed" }), { status: 405 }),
       );
     }
 
@@ -51,19 +50,19 @@ serve(async (req) => {
       return withCorsHeaders(
         new Response(JSON.stringify({ error: "tx_ref, transaction_id and user_id required" }), {
           status: 400,
-        })
+        }),
       );
     }
 
-    // 1️⃣ Verify with Flutterwave
+    // ✅ 1. Verify with Flutterwave
     const fwRes = await fetch(
       `https://api.flutterwave.com/v3/transactions/${transaction_id}/verify`,
       {
         headers: {
-          Authorization: `Bearer ${FLUTTERWAVE_SECRET_KEY}`,
+          Authorization: `Bearer ${FLW_SECRET_KEY}`, // ✅ fixed variable
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     const fwJson = await fwRes.json();
@@ -79,7 +78,7 @@ serve(async (req) => {
           status: "failed",
           metadata: fwJson,
         },
-        { onConflict: ["tx_ref"] }
+        { onConflict: ["tx_ref"] },
       );
 
       return withCorsHeaders(
@@ -89,8 +88,8 @@ serve(async (req) => {
             reason: "flutterwave_verification_failed",
             fwJson,
           }),
-          { status: 400 }
-        )
+          { status: 400 },
+        ),
       );
     }
 
@@ -112,14 +111,14 @@ serve(async (req) => {
           status: "failed",
           metadata: fwJson,
         },
-        { onConflict: ["tx_ref"] }
+        { onConflict: ["tx_ref"] },
       );
 
       return withCorsHeaders(
         new Response(
           JSON.stringify({ verified: false, reason: "payment_not_successful", fwData }),
-          { status: 400 }
-        )
+          { status: 400 },
+        ),
       );
     }
 
@@ -134,17 +133,17 @@ serve(async (req) => {
           status: "failed",
           metadata: fwJson,
         },
-        { onConflict: ["tx_ref"] }
+        { onConflict: ["tx_ref"] },
       );
 
       return withCorsHeaders(
         new Response(JSON.stringify({ verified: false, reason: "tx_ref_mismatch", fwData }), {
           status: 400,
-        })
+        }),
       );
     }
 
-    // 2️⃣ Load user
+    // ✅ 2. Load user
     const { data: userRows, error: userError } = await supabase
       .from("users")
       .select("id, email, earn_rate")
@@ -156,21 +155,21 @@ serve(async (req) => {
       return withCorsHeaders(
         new Response(
           JSON.stringify({ error: "db_user_lookup_failed", details: userError.message }),
-          { status: 500 }
-        )
+          { status: 500 },
+        ),
       );
     }
+
     if (!userRows) {
-      return withCorsHeaders(new Response(JSON.stringify({ error: "user_not_found" }), { status: 404 }));
+      return withCorsHeaders(
+        new Response(JSON.stringify({ error: "user_not_found" }), { status: 404 }),
+      );
     }
 
     const userEmail = (userRows.email || "").toLowerCase();
 
-    // ✅ FIX: Skip email check in test mode
     const isTestMode = fwTxRef.startsWith("ctoe_") || fwCustomerEmail?.includes("ravesb_");
     const cleanFwEmail = fwCustomerEmail?.replace(/^ravesb_[^_]+_/, "").toLowerCase();
-
-    console.log("Email check:", { fwCustomerEmail, cleanFwEmail, userEmail, isTestMode });
 
     if (!isTestMode && cleanFwEmail !== userEmail) {
       await supabase.from("transactions").upsert(
@@ -183,7 +182,7 @@ serve(async (req) => {
           status: "failed",
           metadata: fwJson,
         },
-        { onConflict: ["tx_ref"] }
+        { onConflict: ["tx_ref"] },
       );
 
       return withCorsHeaders(
@@ -195,12 +194,12 @@ serve(async (req) => {
             cleanFwEmail,
             userEmail,
           }),
-          { status: 400 }
-        )
+          { status: 400 },
+        ),
       );
     }
 
-    // 3️⃣ Record successful transaction
+    // ✅ 3. Record successful transaction
     const { error: insertError } = await supabase.from("transactions").upsert(
       {
         tx_ref,
@@ -211,19 +210,19 @@ serve(async (req) => {
         status: "success",
         metadata: fwJson,
       },
-      { onConflict: ["tx_ref"] }
+      { onConflict: ["tx_ref"] },
     );
 
     if (insertError) {
       return withCorsHeaders(
         new Response(
           JSON.stringify({ error: "insert_transaction_failed", details: insertError.message }),
-          { status: 500 }
-        )
+          { status: 500 },
+        ),
       );
     }
 
-    // 4️⃣ Update user's earn_rate by +35%
+    // ✅ 4. Update user's earn_rate by +35%
     const currentEarn = parseFloat(userRows.earn_rate ?? "0");
     const newEarn = Number((currentEarn * 1.35).toFixed(2));
 
@@ -240,12 +239,11 @@ serve(async (req) => {
             warning: "transaction_recorded_but_failed_update_user",
             updateError: updateError.message,
           }),
-          { status: 200 }
-        )
+          { status: 200 },
+        ),
       );
     }
 
-    // ✅ Final success response
     return withCorsHeaders(
       new Response(
         JSON.stringify({
@@ -253,16 +251,16 @@ serve(async (req) => {
           newEarnRate: newEarn,
           emailCheck: isTestMode ? "skipped (test mode)" : "passed",
         }),
-        { status: 200 }
-      )
+        { status: 200 },
+      ),
     );
   } catch (err: any) {
     console.error("verify-payment error", err);
     return withCorsHeaders(
       new Response(
         JSON.stringify({ error: "internal_error", details: err.message ?? err.toString() }),
-        { status: 500 }
-      )
+        { status: 500 },
+      ),
     );
   }
 });
