@@ -4,17 +4,16 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // 🧩 Environment variables
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const FLW_SECRET_KEY = Deno.env.get("FLUTTERWAVE_SECRET_KEY")!; // ✅ correct
-const FLW_PUBLIC_KEY = Deno.env.get("VITE_FLW_PUBLIC_KEY") || "";
+const PROJECT_URL = Deno.env.get("PROJECT_URL")!;
+const SERVICE_ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY")!;
+const FLW_SECRET_KEY = Deno.env.get("FLUTTERWAVE_SECRET_KEY")!;
 
-// ✅ Check envs
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !FLW_SECRET_KEY) {
-  console.error("❌ Missing environment variables.");
+if (!PROJECT_URL || !SERVICE_ROLE_KEY || !FLW_SECRET_KEY) {
+  console.error("❌ Missing environment variables.", { PROJECT_URL, SERVICE_ROLE_KEY, FLW_SECRET_KEY });
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY);
+
 
 // ✅ Helper to add CORS headers
 function withCorsHeaders(res: Response) {
