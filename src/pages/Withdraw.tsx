@@ -31,6 +31,11 @@ export function Withdraw({ onBack }: WithdrawProps) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  const exchangeRate = 0.5; // ✅ 0.5 Naira = 1 PT
+  const nairaEquivalent = amount
+    ? (parseFloat(amount) * exchangeRate).toFixed(2)
+    : "0.00";
+
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -152,6 +157,14 @@ export function Withdraw({ onBack }: WithdrawProps) {
                 className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-lg"
                 placeholder="0.00"
               />
+
+              {/* ✅ Exchange rate display */}
+              <p className="text-gray-400 text-sm mt-2">💱 1 PT = ₦0.5</p>
+              {amount && (
+                <p className="text-green-400 text-sm font-medium mt-1">
+                  ≈ ₦{nairaEquivalent} will be sent to your account
+                </p>
+              )}
             </div>
 
             <div>

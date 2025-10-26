@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { Auth } from './pages/Auth';
-import { Dashboard } from './pages/Dashboard';
-import { Deposit } from './pages/Deposit';
-import { Withdraw } from './pages/Withdraw';
-import { AdminPanel } from './pages/AdminPanel';
+import { useState } from "react";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { Auth } from "./pages/Auth";
+import { Dashboard } from "./pages/Dashboard";
+import { Deposit } from "./pages/Deposit";
+import { Withdraw } from "./pages/Withdraw";
+import { AdminPanel } from "./pages/AdminPanel";
+import { Leaderboard } from "./pages/Leaderboard";
 
-type Page = 'dashboard' | 'deposit' | 'withdraw' | 'admin';
+type Page = "dashboard" | "deposit" | "withdraw" | "leaderboard" | "admin";
 
 function AppContent() {
   const { user, loading } = useAuth();
-  const [currentPage, setCurrentPage] = useState<Page>('dashboard');
+  const [currentPage, setCurrentPage] = useState<Page>("dashboard");
 
   if (loading) {
     return (
@@ -25,12 +26,14 @@ function AppContent() {
   }
 
   switch (currentPage) {
-    case 'deposit':
-      return <Deposit onBack={() => setCurrentPage('dashboard')} />;
-    case 'withdraw':
-      return <Withdraw onBack={() => setCurrentPage('dashboard')} />;
-    case 'admin':
-      return <AdminPanel onBack={() => setCurrentPage('dashboard')} />;
+    case "deposit":
+      return <Deposit onBack={() => setCurrentPage("dashboard")} />;
+    case "withdraw":
+      return <Withdraw onBack={() => setCurrentPage("dashboard")} />;
+    case "leaderboard":
+      return <Leaderboard onBack={() => setCurrentPage("dashboard")} />;
+    case "admin":
+      return <AdminPanel onBack={() => setCurrentPage("dashboard")} />;
     default:
       return <Dashboard onNavigate={setCurrentPage} />;
   }

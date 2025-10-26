@@ -6,14 +6,15 @@ import {
   ArrowUpCircle,
   LogOut,
   Shield,
+  Trophy,
 } from "lucide-react";
-import { motion } from "framer-motion"; // ✅ added for animation
+import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import { useUserData } from "../hooks/useUserData";
 import { supabase } from "../lib/supabase";
 
 interface DashboardProps {
-  onNavigate: (page: "deposit" | "withdraw" | "admin") => void;
+  onNavigate: (page: "deposit" | "withdraw" | "admin" | "leaderboard") => void;
 }
 
 export function Dashboard({ onNavigate }: DashboardProps) {
@@ -23,7 +24,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
   const [claimError, setClaimError] = useState("");
   const [timeUntilClaim, setTimeUntilClaim] = useState<string>("");
   const [canClaim, setCanClaim] = useState(false);
-  const [progress, setProgress] = useState(100); // ✅ new: progress for timer bar
+  const [progress, setProgress] = useState(100);
 
   useEffect(() => {
     if (!userData) return;
@@ -53,7 +54,6 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         const seconds = Math.floor((diff % (60 * 1000)) / 1000);
         setTimeUntilClaim(`${hours}h ${minutes}m ${seconds}s`);
 
-        // ✅ new: calculate progress percentage
         const totalElapsed = cooldownMs - diff;
         const percent = (totalElapsed / cooldownMs) * 100;
         setProgress(Math.min(Math.max(percent, 0), 100));
@@ -157,7 +157,6 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               per claim
             </p>
 
-            {/* ✅ New animated progress bar */}
             {!canClaim && (
               <div className="w-full bg-gray-600/40 rounded-full h-3 mt-4 overflow-hidden">
                 <motion.div
@@ -221,6 +220,15 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </button>
         </div>
 
+        {/* 🏆 Leaderboard Button */}
+        <button
+          onClick={() => onNavigate("leaderboard")}
+          className="w-full py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-[1.02] mb-4 flex justify-center items-center gap-2"
+        >
+          <Trophy size={22} />
+          View Leaderboard 🏆
+        </button>
+
         {userData.is_admin && (
           <button
             onClick={() => onNavigate("admin")}
@@ -234,10 +242,12 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </button>
         )}
       </div>
+
       {/* --- Social Media Links --- */}
       <div className="flex justify-center items-center gap-6 mt-8">
+        {/* X / Twitter */}
         <a
-          href="https://twitter.com/yourhandle"
+          href="https://x.com/earnquiza"
           target="_blank"
           rel="noopener noreferrer"
           className="text-gray-400 hover:text-white transition"
@@ -252,8 +262,9 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </svg>
         </a>
 
+        {/* Facebook */}
         <a
-          href="https://facebook.com/yourhandle"
+          href=""
           target="_blank"
           rel="noopener noreferrer"
           className="text-gray-400 hover:text-white transition"
@@ -268,8 +279,9 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </svg>
         </a>
 
+        {/* Instagram */}
         <a
-          href="https://instagram.com/yourhandle"
+          href=""
           target="_blank"
           rel="noopener noreferrer"
           className="text-gray-400 hover:text-white transition"
@@ -281,6 +293,23 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             className="w-6 h-6"
           >
             <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 1.5A4.25 4.25 0 003.5 7.75v8.5A4.25 4.25 0 007.75 20.5h8.5a4.25 4.25 0 004.25-4.25v-8.5A4.25 4.25 0 0016.25 3.5h-8.5zm4.25 4.25a5 5 0 110 10 5 5 0 010-10zm0 1.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm5.25-.88a1.13 1.13 0 110 2.26 1.13 1.13 0 010-2.26z" />
+          </svg>
+        </a>
+
+        {/* ✅ Telegram */}
+        <a
+          href="https://t.me/earnquiza"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-400 hover:text-blue-400 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-6 h-6"
+          >
+            <path d="M9.04 15.59l-.37 4.4c.53 0 .76-.23 1.03-.51l2.48-2.36 5.15 3.77c.95.53 1.62.25 1.88-.88l3.4-15.97v-.01c.3-1.34-.48-1.87-1.38-1.55L1.7 9.67c-1.3.51-1.28 1.25-.23 1.58l4.22 1.31L18.59 5.5c.56-.34 1.08-.15.66.19" />
           </svg>
         </a>
       </div>
