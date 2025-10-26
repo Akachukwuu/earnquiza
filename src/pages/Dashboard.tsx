@@ -17,6 +17,17 @@ interface DashboardProps {
   onNavigate: (page: "deposit" | "withdraw" | "admin" | "leaderboard") => void;
 }
 
+// ✅ Helper function to format PTs (handles number or string safely)
+function formatPT(value: number | string): string {
+  const num = typeof value === "string" ? parseFloat(value) : value;
+  if (isNaN(num)) return "0";
+
+  if (num >= 1_000_000)
+    return (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (num >= 1_000) return (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
+  return num.toFixed(2);
+}
+
 export function Dashboard({ onNavigate }: DashboardProps) {
   const { signOut } = useAuth();
   const { userData, loading, refetch } = useUserData();
@@ -73,9 +84,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
 
     try {
       const now = new Date().toISOString();
-      const newBalance =
-        parseFloat(userData.balance.toString()) +
-        parseFloat(userData.earn_rate.toString());
+      const newBalance = Number(userData.balance) + Number(userData.earn_rate);
 
       const { error } = await supabase
         .from("users")
@@ -129,17 +138,19 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </button>
         </div>
 
+        {/* 💰 Balance Section */}
         <div className="bg-gray-800 rounded-2xl shadow-2xl border border-gray-700 p-8 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <Coins className="text-emerald-400" size={32} />
             <div>
               <p className="text-gray-400 text-sm">Your Balance</p>
               <p className="text-4xl md:text-5xl font-bold text-white">
-                {parseFloat(userData.balance.toString()).toFixed(2)} PTs
+                {formatPT(userData.balance)} PTs
               </p>
             </div>
           </div>
 
+          {/* ⏰ Claim Timer Section */}
           <div className="bg-gray-700/50 rounded-lg p-4 mb-6">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="text-emerald-400" size={20} />
@@ -153,8 +164,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               {timeUntilClaim}
             </p>
             <p className="text-gray-400 text-sm mt-1">
-              Earn {parseFloat(userData.earn_rate.toString()).toFixed(2)} PTs
-              per claim
+              Earn {Number(userData.earn_rate).toFixed(2)} PTs per claim
             </p>
 
             {!canClaim && (
@@ -192,6 +202,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </button>
         </div>
 
+        {/* 🚀 Action Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <button
             onClick={() => onNavigate("deposit")}
@@ -229,6 +240,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           View Leaderboard 🏆
         </button>
 
+        {/* 👑 Admin Button */}
         {userData.is_admin && (
           <button
             onClick={() => onNavigate("admin")}
@@ -243,7 +255,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         )}
       </div>
 
-      {/* --- Social Media Links --- */}
+      {/* 🌐 Social Media Links */}
       <div className="flex justify-center items-center gap-6 mt-8">
         {/* X / Twitter */}
         <a
@@ -262,41 +274,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </svg>
         </a>
 
-        {/* Facebook */}
-        <a
-          href=""
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-gray-400 hover:text-white transition"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-6 h-6"
-          >
-            <path d="M22 12.07C22 6.48 17.52 2 11.93 2S1.86 6.48 1.86 12.07c0 4.99 3.66 9.12 8.44 9.88v-6.99H7.9v-2.89h2.4V9.83c0-2.38 1.42-3.7 3.6-3.7 1.04 0 2.12.18 2.12.18v2.33h-1.19c-1.17 0-1.53.73-1.53 1.47v1.76h2.61l-.42 2.89h-2.19v6.99c4.78-.76 8.44-4.89 8.44-9.88z" />
-          </svg>
-        </a>
-
-        {/* Instagram */}
-        <a
-          href=""
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-gray-400 hover:text-white transition"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-6 h-6"
-          >
-            <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 1.5A4.25 4.25 0 003.5 7.75v8.5A4.25 4.25 0 007.75 20.5h8.5a4.25 4.25 0 004.25-4.25v-8.5A4.25 4.25 0 0016.25 3.5h-8.5zm4.25 4.25a5 5 0 110 10 5 5 0 010-10zm0 1.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm5.25-.88a1.13 1.13 0 110 2.26 1.13 1.13 0 010-2.26z" />
-          </svg>
-        </a>
-
-        {/* ✅ Telegram */}
+        {/* Telegram */}
         <a
           href="https://t.me/earnquiza"
           target="_blank"
